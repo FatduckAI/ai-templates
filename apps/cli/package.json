@@ -30,9 +30,6 @@
     "bun-types": "latest"
   },
   "publishConfig": {
-    "access": "public",
-    "dependencies": {
-      "@fatduckai/core": "^0.2.0"
-    }
+    "access": "public"
   }
 }
