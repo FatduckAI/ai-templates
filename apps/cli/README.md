@@ -2,18 +2,6 @@
 
 Command-line interface for managing AI prompts and tools in your FatDuck AI projects.
 
-## 🚀 Quick Start
-
-You can use the CLI directly with npx without installing:
-
-```bash
-# Add a prompt to your project
-npx fatduckai add tweet
-
-# Add a tool to your project
-npx fatduckai add btc-price
-```
-
 ## 📦 Installation
 
 ### Global Installation
