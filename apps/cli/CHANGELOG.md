@@ -1,5 +1,11 @@
 # @fatduckai/cli
 
+## 0.3.0
+
+### Minor Changes
+
+- db7e8ab: working cli
+
 ## 0.2.6
 
 ### Patch Changes
