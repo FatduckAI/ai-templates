@@ -1,6 +1,6 @@
 {
   "name": "@fatduckai/cli",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "CLI tool for managing FatDuck AI prompts and tools",
   "type": "module",
   "bin": {
