@@ -1,36 +1,186 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# @fatduckai/cli
 
-## Getting Started
+Command-line interface for managing AI prompts and tools in your FatDuck AI projects.
 
-First, run the development server:
+## 🚀 Quick Start
+
+You can use the CLI directly with npx without installing:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# Add a prompt to your project
+npx fatduckai add tweet
+
+# Add a tool to your project
+npx fatduckai add btc-price
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 📦 Installation
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Global Installation
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+# Using npm
+npm install -g @fatduckai/cli
 
-## Learn More
+# Using bun
+bun install -g @fatduckai/cli
 
-To learn more about Next.js, take a look at the following resources:
+# Now you can use the CLI directly
+fatduckai add tweet
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Local Installation
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+# Using npm
+npm install --save-dev @fatduckai/cli
 
-## Deploy on Vercel
+# Using bun
+bun add -d @fatduckai/cli
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🛠️ Commands
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### `add <component>`
+
+Add a prompt or tool to your project.
+
+```bash
+fatduckai add tweet              # Add the tweet prompt
+fatduckai add btc-price         # Add the Bitcoin price tool
+fatduckai add tweet --yes       # Skip confirmation prompt
+```
+
+The command will:
+
+1. Create the appropriate directory structure (`ai/prompts` or `ai/tools`)
+2. Generate a TypeScript file with the component configuration
+3. Show usage instructions
+
+### Help
+
+```bash
+# Show general help
+fatduckai --help
+
+# Show help for a specific command
+fatduckai add --help
+```
+
+## 📁 Project Structure
+
+When you add components, they are organized in the following structure:
+
+```
+your-project/
+├── ai/
+│   ├── prompts/
+│   │   └── tweet.ts
+│   └── tools/
+│       └── btc-price.ts
+```
+
+## 🧪 Development
+
+### Setup
+
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/fatduckai
+cd packages/cli
+
+# Install dependencies
+bun install
+```
+
+### Build
+
+```bash
+# Build the project
+bun run build
+```
+
+### Testing
+
+```bash
+# Run unit tests
+bun test
+
+# Run manual test script
+bun run test/manual-test.ts
+```
+
+### Development Mode
+
+```bash
+# Run CLI in development mode
+bun run dev add tweet
+```
+
+## 📝 Example Usage
+
+### Adding and Using a Prompt
+
+1. Add the tweet prompt to your project:
+
+```bash
+fatduckai add tweet
+```
+
+2. Use the prompt in your code:
+
+```typescript
+import { tweet } from "./ai/prompts/tweet";
+
+// Use the prompt with your AI service
+const result = await ai.generate(tweet.template, {
+  topic: "AI advancements",
+  tone: "professional",
+  includeHashtags: true,
+  includeEmojis: true,
+});
+```
+
+### Adding and Using a Tool
+
+1. Add the Bitcoin price tool:
+
+```bash
+fatduckai add btc-price
+```
+
+2. Use the tool in your code:
+
+```typescript
+import { btcPrice } from "./ai/tools/btc-price";
+
+const price = await btcPrice.handler({
+  config: {
+    currency: "USD",
+    precision: 2,
+  },
+});
+```
+
+## 🔧 Configuration
+
+The CLI will respect any `.fatduckrc` or `fatduck.config.js` file in your project root. Example configuration:
+
+```json
+{
+  "outputDir": "custom/path",
+  "typescript": true
+}
+```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
