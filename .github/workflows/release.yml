@@ -47,6 +47,33 @@ jobs:
         uses: changesets/action@v1
         with:
           version: bun run version-packages
+          publish: |
+            # Replace workspace protocol with actual versions before publishing
+            node -e "
+              const fs = require('fs');
+              const path = require('path');
+              
+              const cliPkgPath = './apps/cli/package.json';
+              const corePkgPath = './packages/core/package.json';
+              
+              const cliPkg = JSON.parse(fs.readFileSync(cliPkgPath, 'utf8'));
+              const corePkg = JSON.parse(fs.readFileSync(corePkgPath, 'utf8'));
+              
+              if (cliPkg.dependencies['@fatduckai/core'] === 'workspace:*') {
+                console.log('Replacing workspace:* with actual version');
+                cliPkg.dependencies['@fatduckai/core'] = '^' + corePkg.version;
+                fs.writeFileSync(cliPkgPath, JSON.stringify(cliPkg, null, 2) + '\n');
+              }
+            "
+            bun run release
+          commit: "chore: update versions"
+          title: "chore: update versions"
+
+      - name: Create Release Pull Request or Publish to npm
+        id: changesets
+        uses: changesets/action@v1
+        with:
+          version: bun run version-packages
           publish: bun run release
           commit: "chore: update versions"
           title: "chore: update versions"
