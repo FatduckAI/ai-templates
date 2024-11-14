@@ -1,5 +1,14 @@
 # @fatduckai/cli
 
+## 0.2.2
+
+### Patch Changes
+
+- 63a836d: updated changeset
+- 4cf4319: fix
+- Updated dependencies [63a836d]
+  - @fatduckai/core@0.2.1
+
 ## 0.2.1
 
 ### Patch Changes
