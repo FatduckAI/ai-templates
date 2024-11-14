@@ -7,7 +7,7 @@
     "fatduckai": "./dist/index.js"
   },
   "scripts": {
-    "build": "bun build ./src/index.ts --outdir ./dist --target node",
+    "build": "bun build ./src/index.ts --outdir ./dist --target node --shebang",
     "test": "bun test",
     "start": "bun run dist/index.js",
     "dev": "bun run src/index.ts",
