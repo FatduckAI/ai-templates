@@ -1,5 +1,11 @@
 # @fatduckai/cli
 
+## 0.2.1
+
+### Patch Changes
+
+- facca40: updated workflow file
+
 ## 0.2.0
 
 ### Minor Changes
