@@ -1,5 +1,11 @@
 # @fatduckai/cli
 
+## 0.2.0
+
+### Minor Changes
+
+- 751af26: fix readme
+
 ## 0.1.0
 
 ### Minor Changes
