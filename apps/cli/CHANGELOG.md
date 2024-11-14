@@ -1,5 +1,11 @@
 # @fatduckai/cli
 
+## 0.2.4
+
+### Patch Changes
+
+- cc9d854: fix release
+
 ## 0.2.3
 
 ### Patch Changes
