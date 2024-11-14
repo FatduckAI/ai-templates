@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import chalk from "chalk";
 import { Command } from "commander";
 import { mkdir, writeFile } from "fs/promises";
