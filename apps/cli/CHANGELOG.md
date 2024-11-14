@@ -1,5 +1,11 @@
 # @fatduckai/cli
 
+## 0.2.6
+
+### Patch Changes
+
+- 7f0e184: fix cli
+
 ## 0.2.5
 
 ### Patch Changes
