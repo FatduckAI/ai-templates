@@ -1,5 +1,12 @@
 # @fatduckai/cli
 
+## 0.6.1
+
+### Patch Changes
+
+- Updated dependencies [395f91c]
+  - @fatduckai/core@0.5.1
+
 ## 0.6.0
 
 ### Minor Changes

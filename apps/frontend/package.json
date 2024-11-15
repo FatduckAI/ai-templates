@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@fatduckai/core": "0.5.0",
+    "@fatduckai/core": "0.5.1",
     "@fatduckai/ai": "0.3.3",
     "@radix-ui/react-collapsible": "^1.1.1",
     "@radix-ui/react-dialog": "^1.1.2",
