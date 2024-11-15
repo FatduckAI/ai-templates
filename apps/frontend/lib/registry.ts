@@ -1,4 +1,5 @@
 import {
+  Client,
   isPrompt,
   isTool,
   RegistryItemType,
@@ -46,7 +47,7 @@ import { BaseAIItem } from "@/types/registry";
 
 // Generates example usage code for prompts and tools
 export function getUsageExample(
-  item: BaseAIItem | SpecializedPrompt | Tool
+  item: BaseAIItem | SpecializedPrompt | Tool | Client
 ): string {
   if (isPrompt(item)) {
     return `import { PromptBuilder } from '@fatduckai/ai'

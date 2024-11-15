@@ -48,6 +48,22 @@ export interface Tool {
   source?: string;
 }
 
+export interface Client {
+  id: string;
+  name: string;
+  description: string;
+  version?: string;
+  type: "client";
+  category: string;
+  configSchema: z.ZodType;
+  outputSchema: z.ZodType;
+  handler: (context: {
+    config: Record<string, unknown>;
+    metadata?: Record<string, unknown>;
+  }) => Promise<unknown>;
+  source?: string;
+}
+
 // Prompt-Tool Pairing interface
 export interface PromptToolPairing {
   promptId: string;
@@ -56,7 +72,7 @@ export interface PromptToolPairing {
 }
 
 // Union type for all registry items
-export type RegistryItemType = BaseAIItem | SpecializedPrompt | Tool;
+export type RegistryItemType = BaseAIItem | SpecializedPrompt | Tool | Client;
 
 // Type guard for checking if an item is a prompt
 export function isPrompt(

@@ -1,4 +1,5 @@
 import { RegistryItem } from "@/components/registry-item";
+import { RegistryItemType } from "@/types/registry";
 import { getClientById } from "@fatduckai/core";
 import { notFound } from "next/navigation";
 
@@ -14,5 +15,5 @@ export default async function ClientPage({
     notFound();
   }
 
-  return <RegistryItem item={client} />;
+  return <RegistryItem item={client as RegistryItemType} />;
 }
