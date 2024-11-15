@@ -1,5 +1,11 @@
 # @fatduckai/core
 
+## 0.5.1
+
+### Patch Changes
+
+- 395f91c: fix export
+
 ## 0.5.0
 
 ### Minor Changes
