@@ -1,7 +1,5 @@
 import chalk from "chalk";
 import { Command } from "commander";
-import { readFileSync } from "fs";
-import { resolve } from "path";
 import { AddHandler } from "./handlers/add";
 import { InitHandler } from "./handlers/init";
 import { ListHandler } from "./handlers/list";
@@ -18,20 +16,12 @@ export class FatDuckCLI {
       .name("fatduck")
       .description(
         chalk.cyan("🦆 Add AI prompts, tools, and clients to your project")
-      )
-      .version(this.getVersion());
+      );
 
     this.packageManager = new PackageManagerService();
     this.github = new GitHubService();
 
     this.setupCommands();
-  }
-
-  private getVersion(): string {
-    const pkg = JSON.parse(
-      readFileSync(resolve(__dirname, "../package.json"), "utf-8")
-    );
-    return pkg.version || "0.0.0";
   }
 
   private setupCommands() {
