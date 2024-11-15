@@ -53,8 +53,9 @@ export class TelegramClient {
 
   public async start() {
     try {
-      await this.bot.launch();
-      console.log("🚀 Telegram bot started successfully");
+      await this.bot.launch(() =>
+        console.log("🚀 Telegram bot started successfully")
+      );
 
       // Enable graceful shutdown
       process.once("SIGINT", () => this.stop("SIGINT"));
