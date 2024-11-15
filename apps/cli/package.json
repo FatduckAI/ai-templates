@@ -22,7 +22,8 @@
     "commander": "^12.1.0",
     "glob": "^11.0.0",
     "ora": "^8.1.1",
-    "prompts": "^2.4.2"
+    "prompts": "^2.4.2",
+    "telegraf": "^4.16.3"
   },
   "devDependencies": {
     "@types/node": "^20.8.2",
