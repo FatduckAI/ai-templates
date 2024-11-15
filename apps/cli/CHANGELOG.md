@@ -1,5 +1,11 @@
 # @fatduckai/cli
 
+## 0.4.2
+
+### Patch Changes
+
+- babaed9: fix version
+
 ## 0.4.1
 
 ### Patch Changes
