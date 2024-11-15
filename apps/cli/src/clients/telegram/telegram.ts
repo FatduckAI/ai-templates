@@ -1,4 +1,4 @@
-export const TELEGRAM_CLIENT = `import { Telegraf } from "telegraf";
+import { Telegraf } from "telegraf";
 import { CallbackHandler } from "./handlers/callbackHandler";
 import { CommandHandler } from "./handlers/commandHandler";
 import { MessageHandler } from "./handlers/message-handler";
@@ -72,4 +72,3 @@ export class TelegramClient {
     this.bot.stop();
   }
 }
-`;

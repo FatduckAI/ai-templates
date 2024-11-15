@@ -25,7 +25,7 @@ export class AddHandler {
 
   async handle(componentName: string, options: AddOptions) {
     const spinner = ora({
-      text: "Loading registry components...\n",
+      text: "Loading registry components...",
       spinner: "dots",
     }).start();
 

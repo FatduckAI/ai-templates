@@ -9,10 +9,9 @@ export class GitHubService {
   private readonly REPO_NAME = "ai-templates";
   private readonly REPO_PATH = "packages/core/src";
   private readonly BRANCH = "master";
-  private readonly LOCAL_PATH: string;
+  private readonly LOCAL_PATH: string | null;
   private readonly DEBUG: boolean;
 
-  // Map of file names to their kebab-case versions
   private readonly FILE_NAMES = {
     messageHandler: "message-handler",
     commandHandler: "command-handler",
@@ -22,14 +21,30 @@ export class GitHubService {
   constructor(options: { debug?: boolean } = {}) {
     this.octokit = new Octokit();
     this.DEBUG = options.debug || process.env.FATDUCK_DEBUG === "true" || false;
-    // In debug mode, always use the local path
-    this.LOCAL_PATH = resolve(process.cwd(), "../../packages/core/src");
+    this.LOCAL_PATH = this.DEBUG
+      ? resolve(process.cwd(), "../../packages/core/src")
+      : null;
   }
 
   public async getComponentType(
     componentName: string
   ): Promise<"prompt" | "tool" | "client" | undefined> {
-    // Check for prompt first
+    if (this.DEBUG) {
+      console.log(
+        chalk.dim(`[DEBUG] Checking component type for: ${componentName}`)
+      );
+    }
+
+    // Check for client
+    const clientPath = `clients/${componentName}/${componentName}.ts`;
+    if (await this.exists(clientPath)) {
+      if (this.DEBUG) {
+        console.log(chalk.dim(`[DEBUG] Found as client: ${componentName}`));
+      }
+      return "client";
+    }
+
+    // Check for prompt
     if (
       (await this.exists(`prompts/base/${componentName}.ts`)) ||
       (await this.exists(`prompts/specialized/${componentName}.ts`))
@@ -42,18 +57,16 @@ export class GitHubService {
       return "tool";
     }
 
-    // Check for client
-    if (await this.exists(`clients/${componentName}/`)) {
-      return "client";
-    }
-
     return undefined;
   }
 
   async getFile(componentPath: string): Promise<string> {
+    if (this.DEBUG) {
+      console.log(chalk.dim(`[DEBUG] Getting file: ${componentPath}`));
+    }
+
     const componentName =
       componentPath.split("/").pop()?.replace(".ts", "") || componentPath;
-
     const componentType = await this.getComponentType(componentName);
 
     if (this.DEBUG) {
@@ -89,17 +102,20 @@ export class GitHubService {
           (await this.tryPath(`prompts/specialized/${componentName}.ts`));
         if (content) {
           const template = this.extractTemplate(content);
+
           if (template) {
             content = template;
           }
         }
         break;
       case "tool":
-        console.log(
-          chalk.dim(
-            `[DEBUG] Trying GitHub: tools/${componentName}/${componentName}.ts`
-          )
-        );
+        if (this.DEBUG) {
+          console.log(
+            chalk.dim(
+              `[DEBUG] Trying path: tools/${componentName}/${componentName}.ts`
+            )
+          );
+        }
         content = await this.tryPath(
           `tools/${componentName}/${componentName}.ts`
         );
@@ -113,40 +129,36 @@ export class GitHubService {
     throw new Error(`Component "${componentName}" not found`);
   }
 
-  private extractTemplate(content: string): string | null {
-    // Look for const SOMETHING_TEMPLATE = ` pattern
-    const templateMatch = content.match(
-      /const\s+(\w+_TEMPLATE)\s*=\s*`([^`]+)`/
+  private extractClientSource(content: string): string | null {
+    // For clients, extract just the code inside the template literal
+    const match = content.match(
+      /export\s+const\s+\w+_CLIENT\s*=\s*`([\s\S]+?)`\s*;?\s*$/
     );
-
-    if (templateMatch) {
-      const [_, templateName, templateContent] = templateMatch;
-      return `export const ${templateName} = \`${templateContent}\`;\n`;
+    if (match) {
+      // Return just the code content from inside the backticks
+      return match[1];
     }
-
     return null;
   }
 
-  private extractClientSource(content: string): string | null {
-    // Look for const SOMETHING_CLIENT = ` pattern
-    const clientMatch = content.match(/const\s+(\w+_CLIENT)\s*=\s*`([^`]+)`/);
-
-    if (clientMatch) {
-      const [_, clientName, clientContent] = clientMatch;
-      return `export const ${clientName} = \`${clientContent}\`;\n`;
+  private extractTemplate(content: string): string | null {
+    // Find const NAME_TEMPLATE = `...`
+    const match = content.match(/const\s+(\w+_TEMPLATE)\s*=\s*`([\s\S]+?)`/);
+    if (match) {
+      const [_, variableName, templateContent] = match;
+      return `export const ${variableName} = \`${templateContent}\`;\n`;
     }
-
     return null;
   }
 
   private async tryPath(path: string): Promise<string | null> {
-    // In debug mode, try local path first
-    if (this.DEBUG) {
+    // Only try local path in debug mode
+    if (this.DEBUG && this.LOCAL_PATH) {
       try {
         const localPath = join(this.LOCAL_PATH, path);
         const content = await readFile(localPath, "utf-8");
         console.log(
-          chalk.dim(`[DEBUG] Found component in local path: ${localPath}`)
+          chalk.dim(`[DEBUG] Found file in local path: ${localPath}`)
         );
         return content;
       } catch (error) {
@@ -156,7 +168,7 @@ export class GitHubService {
       }
     }
 
-    // If not in debug mode or local file not found, use GitHub
+    // Try GitHub
     try {
       const response = await this.octokit.repos.getContent({
         owner: this.REPO_OWNER,
@@ -167,7 +179,7 @@ export class GitHubService {
 
       if ("content" in response.data) {
         if (this.DEBUG) {
-          console.log(chalk.dim(`[DEBUG] Found component in GitHub: ${path}`));
+          console.log(chalk.dim(`[DEBUG] Found file in GitHub: ${path}`));
         }
         return Buffer.from(response.data.content, "base64").toString();
       }
@@ -180,7 +192,11 @@ export class GitHubService {
   }
 
   private async exists(path: string): Promise<boolean> {
-    // In debug mode, check local path first
+    if (this.DEBUG) {
+      console.log(chalk.dim(`[DEBUG] Checking existence: ${path}`));
+    }
+
+    // Only check local path in debug mode
     if (this.DEBUG && this.LOCAL_PATH) {
       try {
         const localPath = join(this.LOCAL_PATH, path);
@@ -194,7 +210,7 @@ export class GitHubService {
       }
     }
 
-    // If not in debug mode or local file not found, check GitHub
+    // Check GitHub
     try {
       const response = await this.octokit.repos.getContent({
         owner: this.REPO_OWNER,
@@ -208,7 +224,7 @@ export class GitHubService {
       return true;
     } catch {
       if (this.DEBUG) {
-        console.log(chalk.dim(`[DEBUG] Not found in GitHub`));
+        console.log(chalk.dim(`[DEBUG] Not found in GitHub: ${path}`));
       }
       return false;
     }
@@ -223,128 +239,218 @@ export class GitHubService {
 
     const results = [];
 
-    // Handle each type of component
-    if (path === "prompts") {
-      // List prompts
-      const basePath = join(this.LOCAL_PATH, "prompts/base");
-      const specializedPath = join(this.LOCAL_PATH, "prompts/specialized");
+    // Only try local path in debug mode
+    if (this.DEBUG && this.LOCAL_PATH) {
+      try {
+        if (path === "prompts") {
+          // Handle base prompts
+          try {
+            const basePath = join(this.LOCAL_PATH, "prompts/base");
+            const baseEntries = await readdir(basePath, {
+              withFileTypes: true,
+            });
+            const basePrompts = baseEntries
+              .filter(
+                (file) =>
+                  file.isFile() &&
+                  file.name.endsWith(".ts") &&
+                  file.name !== "index.ts"
+              )
+              .map((file) => ({
+                name: file.name.replace(".ts", ""),
+                type: "prompt",
+                category: "base",
+              }));
+            results.push(...basePrompts);
+          } catch (error) {
+            if (this.DEBUG) {
+              console.log(chalk.dim(`[DEBUG] No base prompts found locally`));
+            }
+          }
 
-      try {
-        const baseFiles = await readdir(basePath, { withFileTypes: true });
-        results.push(
-          ...baseFiles
-            .filter(
-              (file) =>
-                file.isFile() &&
-                file.name.endsWith(".ts") &&
-                file.name !== "index.ts"
-            )
-            .map((file) => ({
-              name: file.name.replace(".ts", ""),
-              type: "prompt",
-              category: "base",
-            }))
-        );
-      } catch (error) {
-        if (this.DEBUG) {
-          console.log(
-            chalk.dim(`[DEBUG] No base prompts found in: ${basePath}`)
-          );
-        }
-      }
-
-      try {
-        const specializedFiles = await readdir(specializedPath, {
-          withFileTypes: true,
-        });
-        results.push(
-          ...specializedFiles
-            .filter(
-              (file) =>
-                file.isFile() &&
-                file.name.endsWith(".ts") &&
-                file.name !== "index.ts"
-            )
-            .map((file) => ({
-              name: file.name.replace(".ts", ""),
-              type: "prompt",
-              category: "specialized",
-            }))
-        );
-      } catch (error) {
-        if (this.DEBUG) {
-          console.log(
-            chalk.dim(
-              `[DEBUG] No specialized prompts found in: ${specializedPath}`
-            )
-          );
-        }
-      }
-    } else if (path === "clients") {
-      // List clients
-      const clientsPath = join(this.LOCAL_PATH, "clients");
-      try {
-        const entries = await readdir(clientsPath, { withFileTypes: true });
-        results.push(
-          ...entries
+          // Handle specialized prompts
+          try {
+            const specializedPath = join(
+              this.LOCAL_PATH,
+              "prompts/specialized"
+            );
+            const specializedEntries = await readdir(specializedPath, {
+              withFileTypes: true,
+            });
+            const specializedPrompts = specializedEntries
+              .filter(
+                (file) =>
+                  file.isFile() &&
+                  file.name.endsWith(".ts") &&
+                  file.name !== "index.ts"
+              )
+              .map((file) => ({
+                name: file.name.replace(".ts", ""),
+                type: "prompt",
+                category: "specialized",
+              }));
+            results.push(...specializedPrompts);
+          } catch (error) {
+            if (this.DEBUG) {
+              console.log(
+                chalk.dim(`[DEBUG] No specialized prompts found locally`)
+              );
+            }
+          }
+        } else if (path === "clients") {
+          const clientsPath = join(this.LOCAL_PATH, "clients");
+          const entries = await readdir(clientsPath, { withFileTypes: true });
+          const clientDirs = entries
             .filter((entry) => entry.isDirectory() && entry.name !== "logic")
             .map((entry) => ({
               name: entry.name,
               type: "client",
-            }))
-        );
+            }));
+          results.push(...clientDirs);
+        } else if (path === "tools") {
+          const toolsPath = join(this.LOCAL_PATH, "tools");
+          const entries = await readdir(toolsPath, { withFileTypes: true });
+          const toolDirs = entries
+            .filter((entry) => entry.isDirectory() && entry.name !== "index.ts")
+            .map((entry) => ({
+              name: entry.name,
+              type: "tool",
+            }));
+          results.push(...toolDirs);
+        }
       } catch (error) {
         if (this.DEBUG) {
-          console.log(chalk.dim(`[DEBUG] No clients found in: ${clientsPath}`));
+          console.log(
+            chalk.dim(`[DEBUG] Error reading local directory: ${error}`)
+          );
         }
       }
-    } else if (path === "tools") {
-      // List tools
-      const toolsPath = join(this.LOCAL_PATH, "tools");
-      try {
-        const entries = await readdir(toolsPath, { withFileTypes: true });
+    }
 
-        for (const entry of entries) {
-          // Skip index.ts
-          if (entry.name === "index.ts") continue;
+    // Always try GitHub
+    try {
+      if (path === "prompts") {
+        // Get base prompts from GitHub
+        try {
+          const baseResponse = await this.octokit.repos.getContent({
+            owner: this.REPO_OWNER,
+            repo: this.REPO_NAME,
+            path: `${this.REPO_PATH}/prompts/base`,
+            ref: this.BRANCH,
+          });
 
-          if (entry.isDirectory()) {
-            // Handle directory-based tools
-            try {
-              const hasImplementation = await access(
-                join(toolsPath, entry.name, "btc-price.ts")
+          if (Array.isArray(baseResponse.data)) {
+            const githubBasePrompts = baseResponse.data
+              .filter(
+                (item) =>
+                  item.type === "file" &&
+                  item.name.endsWith(".ts") &&
+                  item.name !== "index.ts"
               )
-                .then(() => true)
-                .catch(() => false);
+              .map((item) => ({
+                name: item.name.replace(".ts", ""),
+                type: "prompt",
+                category: "base",
+              }));
 
-              const hasIndex = await access(
-                join(toolsPath, entry.name, "index.ts")
-              )
-                .then(() => true)
-                .catch(() => false);
-
-              if (hasImplementation || hasIndex) {
-                results.push({
-                  name: entry.name,
-                  type: "tool",
-                  format: "directory",
-                });
+            // Merge avoiding duplicates
+            const existingNames = new Set(results.map((r) => r.name));
+            githubBasePrompts.forEach((prompt) => {
+              if (!existingNames.has(prompt.name)) {
+                results.push(prompt);
               }
-            } catch (error) {
-              if (this.DEBUG) {
-                console.log(
-                  chalk.dim(
-                    `[DEBUG] Skipping invalid tool directory: ${entry.name}`
-                  )
-                );
-              }
-            }
+            });
+          }
+        } catch (error) {
+          if (this.DEBUG) {
+            console.log(chalk.dim(`[DEBUG] No base prompts found on GitHub`));
           }
         }
-      } catch (error) {
-        if (this.DEBUG) {
-          console.log(chalk.dim(`[DEBUG] No tools found in: ${toolsPath}`));
+
+        // Get specialized prompts from GitHub
+        try {
+          const specializedResponse = await this.octokit.repos.getContent({
+            owner: this.REPO_OWNER,
+            repo: this.REPO_NAME,
+            path: `${this.REPO_PATH}/prompts/specialized`,
+            ref: this.BRANCH,
+          });
+
+          if (Array.isArray(specializedResponse.data)) {
+            const githubSpecializedPrompts = specializedResponse.data
+              .filter(
+                (item) =>
+                  item.type === "file" &&
+                  item.name.endsWith(".ts") &&
+                  item.name !== "index.ts"
+              )
+              .map((item) => ({
+                name: item.name.replace(".ts", ""),
+                type: "prompt",
+                category: "specialized",
+              }));
+
+            // Merge avoiding duplicates
+            const existingNames = new Set(results.map((r) => r.name));
+            githubSpecializedPrompts.forEach((prompt) => {
+              if (!existingNames.has(prompt.name)) {
+                results.push(prompt);
+              }
+            });
+          }
+        } catch (error) {
+          if (this.DEBUG) {
+            console.log(
+              chalk.dim(`[DEBUG] No specialized prompts found on GitHub`)
+            );
+          }
         }
+      } else {
+        // Handle clients and tools as before
+        const response = await this.octokit.repos.getContent({
+          owner: this.REPO_OWNER,
+          repo: this.REPO_NAME,
+          path: `${this.REPO_PATH}/${path}`,
+          ref: this.BRANCH,
+        });
+
+        if (Array.isArray(response.data)) {
+          if (path === "clients") {
+            const githubClients = response.data
+              .filter((item) => item.type === "dir" && item.name !== "logic")
+              .map((item) => ({
+                name: item.name,
+                type: "client",
+              }));
+
+            // Merge avoiding duplicates
+            const existingNames = new Set(results.map((r) => r.name));
+            githubClients.forEach((client) => {
+              if (!existingNames.has(client.name)) {
+                results.push(client);
+              }
+            });
+          } else if (path === "tools") {
+            const githubTools = response.data
+              .filter((item) => item.type === "dir" && item.name !== "index.ts")
+              .map((item) => ({
+                name: item.name,
+                type: "tool",
+              }));
+
+            // Merge avoiding duplicates
+            const existingNames = new Set(results.map((r) => r.name));
+            githubTools.forEach((tool) => {
+              if (!existingNames.has(tool.name)) {
+                results.push(tool);
+              }
+            });
+          }
+        }
+      }
+    } catch (error) {
+      if (this.DEBUG) {
+        console.log(chalk.dim(`[DEBUG] Error fetching from GitHub: ${error}`));
       }
     }
 
