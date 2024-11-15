@@ -1,4 +1,4 @@
-import { Telegraf } from "telegraf";
+export const TELEGRAM_CLIENT = `import { Telegraf } from "telegraf";
 import { CallbackHandler } from "./handlers/callbackHandler";
 import { CommandHandler } from "./handlers/commandHandler";
 import { MessageHandler } from "./handlers/message-handler";
@@ -67,8 +67,9 @@ export class TelegramClient {
 
   public stop(signal?: string) {
     if (signal) {
-      console.log(`Received ${signal}`);
+      console.log(\`Received signal\`);
     }
     this.bot.stop();
   }
 }
+`;

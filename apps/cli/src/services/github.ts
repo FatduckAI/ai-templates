@@ -76,6 +76,12 @@ export class GitHubService {
         content = await this.tryPath(
           `clients/${componentName}/${componentName}.ts`
         );
+        if (content) {
+          const client = this.extractClientSource(content);
+          if (client) {
+            content = client;
+          }
+        }
         break;
       case "prompt":
         content =
@@ -116,6 +122,18 @@ export class GitHubService {
     if (templateMatch) {
       const [_, templateName, templateContent] = templateMatch;
       return `export const ${templateName} = \`${templateContent}\`;\n`;
+    }
+
+    return null;
+  }
+
+  private extractClientSource(content: string): string | null {
+    // Look for const SOMETHING_CLIENT = ` pattern
+    const clientMatch = content.match(/const\s+(\w+_CLIENT)\s*=\s*`([^`]+)`/);
+
+    if (clientMatch) {
+      const [_, clientName, clientContent] = clientMatch;
+      return `export const ${clientName} = \`${clientContent}\`;\n`;
     }
 
     return null;
