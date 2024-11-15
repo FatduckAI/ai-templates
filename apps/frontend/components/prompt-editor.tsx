@@ -57,26 +57,15 @@ export function PromptEditor({ item, className, onUpdate }: PromptEditorProps) {
   useEffect(() => {
     const extractedVars = extractVariables(template);
     const newVars: Record<string, string> = {};
-    const exampleValues = item.examples[0]?.input || {};
 
     extractedVars.forEach((name) => {
-      newVars[name] =
-        variables[name] ||
-        exampleValues[name]?.toString() ||
-        "" ||
-        getDefaultForVariable(name);
+      newVars[name] = variables[name] || getDefaultForVariable(name);
     });
 
     setVariables(newVars);
   }, [template]);
 
   function getDefaultForVariable(name: string): string {
-    const example = item.examples[0]?.input || {};
-
-    if (name in example) {
-      return String(example[name]);
-    }
-
     switch (name) {
       case "tone":
         return "professional";

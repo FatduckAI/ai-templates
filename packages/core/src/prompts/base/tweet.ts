@@ -21,16 +21,4 @@ export const tweetBasePrompt: BaseAIItem = {
   description: "Base prompt for generating tweets",
   type: "base",
   template: TWEET_TEMPLATE,
-  examples: [
-    {
-      input: {
-        topic: "AI advancements",
-        tone: "professional",
-        includeHashtags: true,
-        includeEmojis: true,
-      },
-      output:
-        "🤖 Breakthrough in AI: Neural networks now show unprecedented learning capabilities in complex environments. Exciting times ahead! #AI #Innovation #TechNews",
-    },
-  ],
 };

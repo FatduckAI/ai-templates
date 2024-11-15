@@ -35,7 +35,7 @@ export function SiteHeader() {
               Docs
             </Link> */}
             <Link
-              href="https://github.com/yourusername/prompt-tools"
+              href="https://github.com/fatduckai/ai-templates"
               className={cn(
                 buttonVariants({ variant: "ghost", size: "sm" }),
                 "w-9 px-0"

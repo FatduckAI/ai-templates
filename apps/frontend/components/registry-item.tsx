@@ -7,6 +7,7 @@ import {
   isPrompt,
   isSpecializedPrompt,
 } from "@/types/registry";
+import { isTool } from "@fatduckai/core";
 import { PromptEditor } from "./prompt-editor";
 import { ToolCard } from "./tool-card";
 
@@ -34,7 +35,7 @@ export function RegistryItem({ item }: RegistryItemProps) {
         <TabsList>
           <TabsTrigger value="usage">Usage</TabsTrigger>
           {isPrompt(item) && <TabsTrigger value="editor">Editor</TabsTrigger>}
-          <TabsTrigger value="examples">Examples</TabsTrigger>
+          <TabsTrigger value="code">Code</TabsTrigger>
           {isSpecializedPrompt(item) && (
             <TabsTrigger value="tools">Compatible Tools</TabsTrigger>
           )}
@@ -43,10 +44,7 @@ export function RegistryItem({ item }: RegistryItemProps) {
         <TabsContent value="usage" className="space-y-4">
           <div className="rounded-md border p-4">
             <h3 className="mb-2 font-medium">Installation</h3>
-            <CopyBlock
-              content={`npx prompt-tools add ${item.type} ${item.id}`}
-              language="bash"
-            />
+            <CopyBlock content={`npx fatduck add ${item.id}`} language="bash" />
           </div>
 
           <div className="rounded-md border p-4">
@@ -61,36 +59,22 @@ export function RegistryItem({ item }: RegistryItemProps) {
           </TabsContent>
         )}
 
-        <TabsContent value="examples" className="space-y-4">
-          {item.examples.map((example, index) => (
-            <div key={index} className="rounded-md border p-4">
-              <h3 className="mb-2 font-medium">Example {index + 1}</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <h4 className="text-sm font-medium">Input</h4>
-                  <CopyBlock
-                    content={JSON.stringify(
-                      "input" in example ? example.input : example.config,
-                      null,
-                      2
-                    )}
-                    language="json"
-                  />
-                </div>
-                <div>
-                  <h4 className="text-sm font-medium">Output</h4>
-                  <CopyBlock
-                    content={JSON.stringify(
-                      "output" in example ? example.output : example.result,
-                      null,
-                      2
-                    )}
-                    language="json"
-                  />
-                </div>
-              </div>
+        <TabsContent value="code" className="space-y-4">
+          {isPrompt(item) && (
+            <div className="rounded-md border p-4">
+              <h3 className="mb-2 font-medium">Copy Code</h3>
+              <CopyBlock content={item.template} language="json" />
             </div>
-          ))}
+          )}
+          {isTool(item) && (
+            <div className="rounded-md border p-4">
+              <h3 className="mb-2 font-medium">Copy Code</h3>
+              <CopyBlock
+                content={item.handler.toString()}
+                language="typescript"
+              />
+            </div>
+          )}
         </TabsContent>
 
         {isSpecializedPrompt(item) && (

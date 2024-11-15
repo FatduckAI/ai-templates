@@ -27,20 +27,4 @@ export const cryptoTweetPrompt: SpecializedPrompt = {
   extends: "tweet",
   template: CRYPTO_TWEET_TEMPLATE,
   suggestedTools: ["btc-price"],
-  examples: [
-    {
-      input: {
-        topic: "Bitcoin rally",
-        priceEmphasis: "high",
-      },
-      tools: {
-        btc_price: {
-          price: "45000.00",
-          currency: "USD",
-        },
-      },
-      output:
-        "🚀 Bitcoin surges to $45,000! Strong momentum indicates growing institutional interest. The future of digital assets is here! #BTC #Crypto #Bitcoin",
-    },
-  ],
 };

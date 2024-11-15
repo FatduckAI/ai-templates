@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { type Tool } from "../../types";
+import { btcPriceToolSource, fetchBTCPriceData } from "./btc-price";
 
 export const btcPriceTool: Tool = {
   id: "btc-price",
@@ -17,24 +18,12 @@ export const btcPriceTool: Tool = {
     timestamp: z.string(),
   }),
   handler: async ({ config }) => {
-    // Implementation remains the same
+    const { currentPrice } = await fetchBTCPriceData();
     return {
-      price: "42500.00",
+      price: currentPrice.toFixed(config.precision as number),
       currency: config.currency,
       timestamp: new Date().toISOString(),
     };
   },
-  examples: [
-    {
-      config: {
-        currency: "USD",
-        precision: 2,
-      },
-      result: {
-        price: "42500.00",
-        currency: "USD",
-        timestamp: new Date().toISOString(),
-      },
-    },
-  ],
+  source: btcPriceToolSource,
 };

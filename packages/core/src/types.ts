@@ -18,11 +18,6 @@ export interface BaseAIItem {
   type: "base";
   template: string;
   variables?: PromptVariables;
-  examples: Array<{
-    input: Record<string, unknown>;
-    output: string;
-    tools?: Record<string, unknown>;
-  }>;
 }
 
 export interface SpecializedPrompt extends Omit<BaseAIItem, "type"> {
@@ -46,10 +41,7 @@ export interface Tool {
     config: Record<string, unknown>;
     metadata?: Record<string, unknown>;
   }) => Promise<unknown>;
-  examples: Array<{
-    config: Record<string, unknown>;
-    result: unknown;
-  }>;
+  source?: string;
 }
 
 export interface PromptToolPairing {

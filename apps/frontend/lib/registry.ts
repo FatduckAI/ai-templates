@@ -1,9 +1,11 @@
 import {
   isPrompt,
+  isTool,
   RegistryItemType,
   SpecializedPrompt,
   Tool,
 } from "@/types/registry";
+
 import { getPromptById, getToolById } from "@fatduckai/core";
 
 export async function getRegistryItem(
@@ -59,15 +61,11 @@ const result = await builder
       .join(",\n    ")}
   })
   .build()`;
-  }
+  } else if (isTool(item)) {
+    return `import { ${item.name} } from '@/ai/tools/${item.id}'
 
-  if ("configSchema" in item) {
-    const example = item.examples[0];
-    return `import { ${item.name} } from '@/tools/${item.id}'
-
-const result = await ${item.name}.handler({
-  config: ${JSON.stringify(example?.config || {}, null, 2)}
-})`;
+    ${item.source}
+const result = await ${item.name}.handler({})`;
   }
 
   return "";
