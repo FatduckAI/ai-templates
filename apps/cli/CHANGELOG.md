@@ -1,5 +1,11 @@
 # @fatduckai/cli
 
+## 0.4.3
+
+### Patch Changes
+
+- f81aa00: fix cli path
+
 ## 0.4.2
 
 ### Patch Changes
