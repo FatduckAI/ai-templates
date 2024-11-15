@@ -1,5 +1,11 @@
 # @fatduckai/core
 
+## 0.5.0
+
+### Minor Changes
+
+- 7833f0e: added github pr and fixed up clients
+
 ## 0.4.0
 
 ### Minor Changes

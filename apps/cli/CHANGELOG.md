@@ -1,5 +1,16 @@
 # @fatduckai/cli
 
+## 0.6.0
+
+### Minor Changes
+
+- 7833f0e: added github pr and fixed up clients
+
+### Patch Changes
+
+- Updated dependencies [7833f0e]
+  - @fatduckai/core@0.5.0
+
 ## 0.5.0
 
 ### Minor Changes
