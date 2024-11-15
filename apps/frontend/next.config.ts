@@ -1,7 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  eslint: {
+    rules: {
+      "@typescript-eslint/no-explicit-any": "warn",
+    },
+  },
 };
 
 export default nextConfig;
