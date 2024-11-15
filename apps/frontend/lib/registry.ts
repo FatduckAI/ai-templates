@@ -1,12 +1,12 @@
 import {
-  getPromptById,
-  getToolById,
   isPrompt,
   isTool,
   RegistryItemType,
   SpecializedPrompt,
   Tool,
-} from "@fatduckai/core";
+} from "@/types/registry";
+
+import { getPromptById, getToolById } from "@fatduckai/core";
 
 export async function getRegistryItem(
   type: string,

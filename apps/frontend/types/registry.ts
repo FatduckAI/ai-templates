@@ -20,11 +20,6 @@ export interface BaseAIItem {
   type: "base";
   template: string;
   variables?: PromptVariables;
-  examples: Array<{
-    input: Record<string, unknown>;
-    output: string;
-    tools?: Record<string, unknown>;
-  }>;
 }
 
 // Specialized prompt type
@@ -58,11 +53,6 @@ export interface PromptToolPairing {
   promptId: string;
   toolIds: string[];
   description: string;
-  examples: Array<{
-    tools: Record<string, unknown>;
-    input: Record<string, unknown>;
-    output: string;
-  }>;
 }
 
 // Union type for all registry items
