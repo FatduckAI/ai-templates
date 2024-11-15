@@ -19,11 +19,11 @@ export class GitHubService {
     callbackHandler: "callback-handler",
   };
 
-  constructor(options: { localPath?: string; debug?: boolean } = {}) {
+  constructor(options: { debug?: boolean } = {}) {
     this.octokit = new Octokit();
-    this.LOCAL_PATH =
-      options.localPath || resolve(process.cwd(), "../../packages/core/src");
     this.DEBUG = options.debug || process.env.FATDUCK_DEBUG === "true" || false;
+    // In debug mode, always use the local path
+    this.LOCAL_PATH = resolve(process.cwd(), "../../packages/core/src");
   }
 
   public async getComponentType(
@@ -139,41 +139,25 @@ export class GitHubService {
     return null;
   }
 
-  private async exists(path: string): Promise<boolean> {
-    try {
-      const localPath = join(this.LOCAL_PATH, path);
-      await access(localPath);
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
   private async tryPath(path: string): Promise<string | null> {
-    try {
-      // Try local path first
-      const localPath = join(this.LOCAL_PATH, path);
+    // In debug mode, try local path first
+    if (this.DEBUG) {
       try {
+        const localPath = join(this.LOCAL_PATH, path);
         const content = await readFile(localPath, "utf-8");
-        if (this.DEBUG) {
-          console.log(
-            chalk.dim(`[DEBUG] Found component in local path: ${localPath}`)
-          );
-        }
+        console.log(
+          chalk.dim(`[DEBUG] Found component in local path: ${localPath}`)
+        );
         return content;
-      } catch {
-        if (this.DEBUG) {
-          console.log(
-            chalk.dim(`[DEBUG] Not found in local path: ${localPath}`)
-          );
-        }
+      } catch (error) {
+        console.log(
+          chalk.dim(`[DEBUG] Not found in local path, trying GitHub`)
+        );
       }
+    }
 
-      // Try GitHub
-      if (this.DEBUG) {
-        console.log(chalk.dim(`[DEBUG] Trying GitHub: ${path}`));
-      }
-
+    // If not in debug mode or local file not found, use GitHub
+    try {
       const response = await this.octokit.repos.getContent({
         owner: this.REPO_OWNER,
         repo: this.REPO_NAME,
@@ -187,10 +171,47 @@ export class GitHubService {
         }
         return Buffer.from(response.data.content, "base64").toString();
       }
-    } catch {
-      return null;
+    } catch (error) {
+      if (this.DEBUG) {
+        console.log(chalk.dim(`[DEBUG] Error fetching from GitHub:`, error));
+      }
     }
     return null;
+  }
+
+  private async exists(path: string): Promise<boolean> {
+    // In debug mode, check local path first
+    if (this.DEBUG && this.LOCAL_PATH) {
+      try {
+        const localPath = join(this.LOCAL_PATH, path);
+        await access(localPath);
+        console.log(chalk.dim(`[DEBUG] Found in local path: ${localPath}`));
+        return true;
+      } catch {
+        console.log(
+          chalk.dim(`[DEBUG] Not found in local path, trying GitHub`)
+        );
+      }
+    }
+
+    // If not in debug mode or local file not found, check GitHub
+    try {
+      const response = await this.octokit.repos.getContent({
+        owner: this.REPO_OWNER,
+        repo: this.REPO_NAME,
+        path: `${this.REPO_PATH}/${path}`,
+        ref: this.BRANCH,
+      });
+      if (this.DEBUG) {
+        console.log(chalk.dim(`[DEBUG] Found in GitHub: ${path}`));
+      }
+      return true;
+    } catch {
+      if (this.DEBUG) {
+        console.log(chalk.dim(`[DEBUG] Not found in GitHub`));
+      }
+      return false;
+    }
   }
 
   async listDirectory(
