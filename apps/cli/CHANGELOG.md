@@ -1,5 +1,11 @@
 # @fatduckai/cli
 
+## 0.4.1
+
+### Patch Changes
+
+- 78d43c0: fix prepack
+
 ## 0.4.0
 
 ### Minor Changes
