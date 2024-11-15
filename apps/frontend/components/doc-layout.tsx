@@ -1,5 +1,10 @@
 import { groupByCategory } from "@/lib/utils";
-import { basePrompts, specializedPrompts, tools } from "@fatduckai/core";
+import {
+  basePrompts,
+  clients,
+  specializedPrompts,
+  tools,
+} from "@fatduckai/core";
 import { DocsSidebar } from "./sidebar";
 
 interface DocLayoutProps {
@@ -48,6 +53,17 @@ export function DocLayout({ children }: DocLayoutProps) {
           })),
         ]
       ),
+    },
+    {
+      title: "Clients",
+      items: [
+        ...clients.map((client) => ({
+          title: client.name,
+          href: `/registry/clients/${client.id}`,
+          description: client.description,
+          badge: "base",
+        })),
+      ],
     },
   ];
 

@@ -1,9 +1,11 @@
 import { BaseAIItem, SpecializedPrompt } from "../types";
+import { telegramBasePrompt } from "./base/telegram";
 import { tweetBasePrompt } from "./base/tweet";
 import { cryptoTweetPrompt } from "./specialized/crypto-tweet";
 
 export const basePrompts: BaseAIItem[] = [
   tweetBasePrompt,
+  telegramBasePrompt,
   // Add other base prompts here
 ];
 

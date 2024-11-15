@@ -55,7 +55,21 @@ export interface PromptToolPairing {
   }>;
 }
 
-export type RegistryItemType = BaseAIItem | SpecializedPrompt | Tool;
+export interface Client {
+  id: string;
+  type: "client";
+  name: string;
+  description: string;
+  category: string;
+  configSchema: z.ZodType;
+  handler: (context: {
+    config: Record<string, unknown>;
+    metadata?: Record<string, unknown>;
+  }) => Promise<unknown>;
+  source?: string;
+}
+
+export type RegistryItemType = BaseAIItem | SpecializedPrompt | Tool | Client;
 
 export function isPrompt(
   item: RegistryItemType
