@@ -1,5 +1,18 @@
 # @fatduckai/cli
 
+## 0.4.0
+
+### Minor Changes
+
+- e4ba9bd: fixed ts, reimplemented cli
+- e4ba9bd: working gen files and updated frontend
+
+### Patch Changes
+
+- Updated dependencies [e4ba9bd]
+- Updated dependencies [e4ba9bd]
+  - @fatduckai/core@0.3.0
+
 ## 0.3.0
 
 ### Minor Changes
