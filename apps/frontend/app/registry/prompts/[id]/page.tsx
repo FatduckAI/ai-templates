@@ -5,9 +5,9 @@ import { notFound } from "next/navigation";
 export default async function PromptPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
-  const { id } = await params;
+  const id = (await params).id;
   const prompt = await getPromptById(id);
 
   if (!prompt) {
