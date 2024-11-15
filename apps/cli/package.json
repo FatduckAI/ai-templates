@@ -11,8 +11,8 @@
     "test": "bun test",
     "start": "bun run dist/index.js",
     "dev": "bun run src/index.ts",
-    "prepack": "node ./scripts/prepack.js",
-    "postpack": "node ./scripts/postpack.js"
+    "prepublishOnly": "node ./scripts/prepack.js",
+    "postpublish": "node ./scripts/postpack.js"
   },
   "dependencies": {
     "@fatduckai/core": "workspace:*",
