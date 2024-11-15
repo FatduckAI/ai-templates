@@ -1,5 +1,11 @@
 # @fatduckai/core
 
+## 0.4.0
+
+### Minor Changes
+
+- 8679870: updated tweet and telegram
+
 ## 0.3.0
 
 ### Minor Changes

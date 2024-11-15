@@ -1,5 +1,16 @@
 # @fatduckai/cli
 
+## 0.5.0
+
+### Minor Changes
+
+- 8679870: updated tweet and telegram
+
+### Patch Changes
+
+- Updated dependencies [8679870]
+  - @fatduckai/core@0.4.0
+
 ## 0.4.3
 
 ### Patch Changes
