@@ -1,11 +1,5 @@
 import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {
-  eslint: {
-    rules: {
-      "@typescript-eslint/no-explicit-any": "warn",
-    },
-  },
-};
+const nextConfig: NextConfig = {};
 
 export default nextConfig;
